@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>hams</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5E5CE0"/>
+      <stop offset="1" stop-color="#3F3BB0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- tile: 824 x 824, corner radius 22.5% -->
+  <rect x="100" y="100" width="824" height="824" rx="185" ry="185" fill="url(#tile)"/>
+
+  <!-- mark: an "h" drawn as two waveform bars joined by an arch, then the sound dying away -->
+  <g fill="none" stroke="#F6F4FF" stroke-width="84" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M296 282V742"/>
+    <path d="M296 524A72 72 0 0 1 440 524V742"/>
+    <path d="M584 547V647" stroke-opacity="0.72"/>
+  </g>
+  <circle cx="728" cy="597" r="42" fill="#F6F4FF" fill-opacity="0.45"/>
+</svg>

@@ -1,0 +1,121 @@
+# hams
+
+Local voice dictation for macOS and Linux. Hold a key, speak, release — the text is typed
+into whatever app has focus. Speech recognition runs on this machine with
+[whisper.cpp](https://github.com/ggml-org/whisper.cpp); no audio or text is sent anywhere.
+The only network call the app ever makes is downloading a speech model when you ask for
+one in Settings.
+
+"hams" (همس) is the Arabic and Urdu word for a whisper.
+
+It is a Tauri rewrite of the Swift app Murmur, so the same code runs on both systems.
+
+## Build and run
+
+Needs Rust, Node 22+ (`.nvmrc`), CMake and a C/C++ compiler. whisper.cpp and llama.cpp
+are compiled from source on the first build, which takes several minutes.
+
+```sh
+npm install
+npm run tauri dev                       # run with live reload
+npm run tauri build -- --bundles app    # macOS: src-tauri/target/release/bundle/macos/hams.app
+npm run tauri build                     # Linux: .deb, .rpm and AppImage
+```
+
+Linux also needs the Tauri system packages (WebKitGTK and friends, see the
+[Tauri prerequisites](https://tauri.app/start/prerequisites/)) and `libasound2-dev`.
+
+## Permissions
+
+**macOS**
+
+- **Microphone** — asked for on first launch.
+- **Accessibility** — needed for the global push-to-talk key and for typing into other apps.
+  Add hams under System Settings → Privacy & Security → Accessibility, then restart hams
+  (there is a button for that in the app). The app is ad-hoc signed, so macOS wants this
+  re-approved after each rebuild: remove the old hams entry, add the new one.
+
+**Linux**
+
+The key is read from the kernel input devices and typing goes through a virtual keyboard,
+which is what makes it work on Wayland as well as X11. That needs one-time setup:
+
+```sh
+sudo usermod -aG input $USER
+echo 'KERNEL=="uinput", GROUP="input", MODE="0660"' | sudo tee /etc/udev/rules.d/99-hams.rules
+sudo udevadm control --reload-rules && sudo udevadm trigger
+# log out and back in
+```
+
+Typing is sent as Ctrl+V, so terminals that paste with Ctrl+Shift+V will not receive it;
+the transcript is still on the clipboard.
+
+## Use
+
+- Hold **Right Option** (Right Alt on Linux; changeable in Settings), speak, release.
+  Pressing any other key while holding cancels. Holds under 0.3 s are ignored.
+- The **Dictate** button and the tray item toggle hands-free recording. Escape cancels.
+- **Tidy long dictations** (Settings, on by default) — from four sentences up, filler
+  sounds ("um", "uh") and immediate repeats ("the the", "we need to, we need to") are
+  dropped. Rule-based and local: it removes words, it never rewords. Deliberate doubles
+  ("had had", "very very"), numbers and names are left alone.
+- **Polish long dictations** (Settings → Cleanup model, off until you download a model) —
+  the same long dictations are also rewritten by a small language model running on this
+  computer through [llama.cpp](https://github.com/ggml-org/llama.cpp): grammar,
+  punctuation, stumbles, and self-corrections ("two gigs, no sorry, four gigs" becomes
+  "four gigs"). The rewrite is only used if it is still what you said — about the same
+  length, the same words, nothing dropped or added; otherwise hams keeps the rule-tidied
+  text. So a model that answers your question instead of cleaning it is ignored.
+- **Insights** — words per minute, fixes made, words by app, streak and an 18-week
+  activity map, all computed from the local history.
+- **Dictionary** — vocabulary hints plus "heard as → correct" replacements.
+- **Snippets** — say the trigger phrase, get the full text.
+- **Scratchpad** — a notes page you can dictate into.
+
+## Where things live
+
+`~/Library/Application Support/hams/` on macOS, `~/.local/share/hams/` on Linux:
+`settings.json`, `history.json`, `dictionary.json`, `snippets.json`, `scratchpad.txt`,
+`audio/*.wav`, `models/*.bin` (speech), `models/*.gguf` (cleanup).
+
+The JSON files use the same format as Murmur's, so they can be copied across.
+
+## Engine checks without the UI
+
+```sh
+hams --transcribe clip.wav [--model base.en] [--lang en] [--prompt "Glossary: …"] [--verbose]
+hams --polish notes.txt [--model qwen2.5-1.5b]
+```
+
+`--transcribe` takes a WAV file (PCM or float, any sample rate, any channel count).
+`--polish` runs the long-dictation cleanup on a text file and reports what the model
+said and whether its rewrite was kept.
+
+## Layout
+
+| Path | Role |
+|---|---|
+| `src-tauri/src/core.rs` | Data model, storage, transcript post-processing (dictionary, tidy, snippets) |
+| `src-tauri/src/audio.rs` | Mic capture, resampling to 16 kHz mono, WAV read/write |
+| `src-tauri/src/transcriber.rs` | whisper.cpp wrapper |
+| `src-tauri/src/download.rs` | Model downloads |
+| `src-tauri/src/polish.rs` | Starts and talks to the cleanup-model helper |
+| `src-tauri/crates/polish/` | `hams-polish`, the helper process that runs llama.cpp. Separate because whisper.cpp and llama.cpp cannot be linked into one binary |
+| `src-tauri/src/app.rs` | App state and the dictation flow |
+| `src-tauri/src/main.rs` | Commands, tray, windows, CLI |
+| `src-tauri/crates/platform/` | Everything OS-specific: global key, typing, permissions (`macos.rs`, `linux.rs`) |
+| `src/` | The window (React + TypeScript) and the floating pill |
+| `branding/` | Logo sources; `src-tauri/icons/` is generated from them with `npm run tauri icon branding/logo.png` |
+
+## Tests
+
+```sh
+npm run sidecar                 # once: builds hams-polish, which the main build expects to exist
+cd src-tauri && cargo test
+cargo check -p hams-platform --target x86_64-unknown-linux-gnu   # type-check the Linux code from a Mac
+```
+
+## Status
+
+Built and run on macOS (Apple Silicon). The Linux code is type-checked from macOS but has
+not yet been run on a Linux machine.

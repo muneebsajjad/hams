@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
+  <title>hams tray glyph</title>
+  <!-- same geometry as logo.svg, scaled so the 516 x 544 mark fits a 36 px box (4 px padding) -->
+  <g transform="translate(22 22) scale(0.06618) translate(-512 -512)">
+    <g fill="none" stroke="#000" stroke-width="84" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M296 282V742"/>
+      <path d="M296 524A72 72 0 0 1 440 524V742"/>
+      <path d="M584 547V647"/>
+    </g>
+    <circle cx="728" cy="597" r="42" fill="#000"/>
+  </g>
+</svg>
