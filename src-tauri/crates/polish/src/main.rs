@@ -152,7 +152,9 @@ fn main() {
     if !args.iter().any(|a| a == "--verbose") {
         backend.void_logs();
     }
-    let model_params = LlamaModelParams::default().with_n_gpu_layers(1000);
+    // Offload to Metal only on Apple Silicon; Metal on Intel Macs' AMD/Intel GPUs is unreliable.
+    let gpu_layers = if cfg!(all(target_os = "macos", target_arch = "aarch64")) { 1000 } else { 0 };
+    let model_params = LlamaModelParams::default().with_n_gpu_layers(gpu_layers);
     let model = LlamaModel::load_from_file(&backend, model_path, &model_params)
         .unwrap_or_else(|e| fail(format!("could not load {model_path} ({e})")));
     let context_params = LlamaContextParams::default()
