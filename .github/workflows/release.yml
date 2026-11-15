@@ -28,7 +28,7 @@ jobs:
             args: ''
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Linux system packages
         if: runner.os == 'Linux'
@@ -38,7 +38,7 @@ jobs:
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
             libxdo-dev libssl-dev libasound2-dev cmake clang file
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -50,7 +50,7 @@ jobs:
       - run: npm ci
 
       # beforeBuildCommand in tauri.conf.json builds the sidecar and the frontend.
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
