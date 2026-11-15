@@ -135,9 +135,7 @@ pub fn open_mic_settings() {
 // MARK: - Clipboard and typing
 
 #[cfg(not(target_os = "linux"))]
-fn with_clipboard<T>(
-    f: impl FnOnce(&mut arboard::Clipboard) -> Result<T, arboard::Error>,
-) -> Result<T, String> {
+fn with_clipboard<T>(f: impl FnOnce(&mut arboard::Clipboard) -> Result<T, arboard::Error>) -> Result<T, String> {
     let mut clipboard = arboard::Clipboard::new().map_err(|e| e.to_string())?;
     f(&mut clipboard).map_err(|e| e.to_string())
 }
@@ -145,9 +143,7 @@ fn with_clipboard<T>(
 /// On Linux the clipboard contents live in the owning process, so one handle is kept
 /// for the lifetime of the app.
 #[cfg(target_os = "linux")]
-fn with_clipboard<T>(
-    f: impl FnOnce(&mut arboard::Clipboard) -> Result<T, arboard::Error>,
-) -> Result<T, String> {
+fn with_clipboard<T>(f: impl FnOnce(&mut arboard::Clipboard) -> Result<T, arboard::Error>) -> Result<T, String> {
     static CLIPBOARD: Mutex<Option<arboard::Clipboard>> = Mutex::new(None);
     let mut guard = CLIPBOARD.lock().unwrap_or_else(|e| e.into_inner());
     if guard.is_none() {
@@ -198,7 +194,11 @@ pub fn play_sound(sound: Sound) {
 pub fn user_first_name() -> Option<String> {
     let full = os::user_full_name()?;
     let first = full.split_whitespace().next()?.trim_matches(',').to_owned();
-    if first.is_empty() { None } else { Some(first) }
+    if first.is_empty() {
+        None
+    } else {
+        Some(first)
+    }
 }
 
 /// Opens a folder in the file manager.
@@ -234,5 +234,9 @@ pub(crate) fn output_of(program: &str, args: &[&str]) -> Option<String> {
         return None;
     }
     let text = String::from_utf8_lossy(&out.stdout).trim().to_owned();
-    if text.is_empty() { None } else { Some(text) }
+    if text.is_empty() {
+        None
+    } else {
+        Some(text)
+    }
 }

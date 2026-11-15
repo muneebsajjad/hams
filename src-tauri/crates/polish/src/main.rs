@@ -116,8 +116,8 @@ fn polish(model: &LlamaModel, context: &mut LlamaContext<'_>, request: &Request)
     // Greedy: the same dictation always cleans up the same way.
     let mut sampler = LlamaSampler::greedy();
     let mut bytes = Vec::<u8>::new();
-    let mut position = tokens.len() as i32;
-    for _ in 0..budget {
+    let start = tokens.len() as i32;
+    for step in 0..budget {
         let token = sampler.sample(context, batch.n_tokens() - 1);
         if vocab.is_eog(token) {
             break;
@@ -127,8 +127,7 @@ fn polish(model: &LlamaModel, context: &mut LlamaContext<'_>, request: &Request)
             break;
         }
         batch.clear();
-        batch.add(token, position, &[0], true).map_err(|e| e.to_string())?;
-        position += 1;
+        batch.add(token, start + step as i32, &[0], true).map_err(|e| e.to_string())?;
         context.decode(&mut batch).map_err(|e| e.to_string())?;
     }
 
@@ -157,9 +156,8 @@ fn main() {
     let model_params = LlamaModelParams::default().with_n_gpu_layers(gpu_layers);
     let model = LlamaModel::load_from_file(&backend, model_path, &model_params)
         .unwrap_or_else(|e| fail(format!("could not load {model_path} ({e})")));
-    let context_params = LlamaContextParams::default()
-        .with_n_ctx(NonZeroU32::new(CONTEXT_TOKENS))
-        .with_n_batch(CONTEXT_TOKENS);
+    let context_params =
+        LlamaContextParams::default().with_n_ctx(NonZeroU32::new(CONTEXT_TOKENS)).with_n_batch(CONTEXT_TOKENS);
     let mut context = model.new_context(&backend, context_params).unwrap_or_else(|e| fail(e.to_string()));
 
     say(&Reply::Ready { ready: true });

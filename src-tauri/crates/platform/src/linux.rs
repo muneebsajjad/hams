@@ -129,12 +129,8 @@ pub fn send_paste() -> Result<(), String> {
         *guard = Some(build_keyboard().map_err(|e| format!("Could not open /dev/uinput: {e}"))?);
     }
     let keyboard = guard.as_mut().unwrap();
-    let steps = [
-        key(KeyCode::KEY_LEFTCTRL, 1),
-        key(KeyCode::KEY_V, 1),
-        key(KeyCode::KEY_V, 0),
-        key(KeyCode::KEY_LEFTCTRL, 0),
-    ];
+    let steps =
+        [key(KeyCode::KEY_LEFTCTRL, 1), key(KeyCode::KEY_V, 1), key(KeyCode::KEY_V, 0), key(KeyCode::KEY_LEFTCTRL, 0)];
     for step in steps {
         keyboard.emit(&[step]).map_err(|e| e.to_string())?;
         std::thread::sleep(Duration::from_millis(8));
@@ -160,7 +156,11 @@ pub fn user_full_name() -> Option<String> {
     let user = std::env::var("USER").ok()?;
     let entry = crate::output_of("getent", &["passwd", &user])?;
     let gecos = entry.split(':').nth(4)?.split(',').next()?.trim().to_owned();
-    if gecos.is_empty() { None } else { Some(gecos) }
+    if gecos.is_empty() {
+        None
+    } else {
+        Some(gecos)
+    }
 }
 
 pub fn open_path(path: &Path) {

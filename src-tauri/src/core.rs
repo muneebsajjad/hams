@@ -123,16 +123,14 @@ pub struct PolishModel {
     pub url: &'static str,
 }
 
-pub const POLISH_MODELS: &[PolishModel] = &[
-    PolishModel {
-        name: "qwen2.5-1.5b",
-        title: "Compact",
-        detail: "Qwen2.5 1.5B · quickest",
-        size_mb: 1066,
-        file: "qwen2.5-1.5b-instruct-q4_k_m.gguf",
-        url: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
-    },
-];
+pub const POLISH_MODELS: &[PolishModel] = &[PolishModel {
+    name: "qwen2.5-1.5b",
+    title: "Compact",
+    detail: "Qwen2.5 1.5B · quickest",
+    size_mb: 1066,
+    file: "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    url: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+}];
 
 impl PolishModel {
     pub fn named(name: &str) -> &'static PolishModel {
@@ -342,7 +340,9 @@ pub mod text {
     pub fn is_long(text: &str) -> bool {
         let sentences = text
             .split_whitespace()
-            .filter(|token| token.trim_end_matches(['"', '\'', ')', '”', '’']).ends_with(['.', '!', '?', '…', '۔', '؟']))
+            .filter(|token| {
+                token.trim_end_matches(['"', '\'', ')', '”', '’']).ends_with(['.', '!', '?', '…', '۔', '؟'])
+            })
             .count();
         sentences >= 4 || word_count(text) >= 60
     }
@@ -350,10 +350,13 @@ pub mod text {
     /// Sounds that carry no meaning.
     const FILLERS: &[&str] = &["um", "umm", "uh", "uhh", "uhm", "er", "erm", "hmm", "mm"];
     /// Words people double on purpose ("had had", "very very", "no no").
-    const DOUBLED_ON_PURPOSE: &[&str] =
-        &["had", "that", "very", "really", "so", "no", "yes", "bye", "ha", "haha", "knock", "oh", "well", "now", "there", "many", "much", "far", "long", "more"];
+    const DOUBLED_ON_PURPOSE: &[&str] = &[
+        "had", "that", "very", "really", "so", "no", "yes", "bye", "ha", "haha", "knock", "oh", "well", "now", "there",
+        "many", "much", "far", "long", "more",
+    ];
     /// Spoken digits repeat legitimately in phone numbers and codes.
-    const NUMBER_WORDS: &[&str] = &["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+    const NUMBER_WORDS: &[&str] =
+        &["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 
     /// The word inside a token, lower-cased, without the punctuation around it.
     fn core_of(token: &str) -> String {
@@ -512,14 +515,20 @@ mod tests {
 
     #[test]
     fn prompt_lists_words() {
-        assert_eq!(prompt(&[word("Propforce", ""), word("  ", ""), word("Loom", "loam")]), "Glossary: Propforce, Loom.");
+        assert_eq!(
+            prompt(&[word("Propforce", ""), word("  ", ""), word("Loom", "loam")]),
+            "Glossary: Propforce, Loom."
+        );
         assert_eq!(prompt(&[]), "");
     }
 
     #[test]
     fn misheard_is_replaced_on_word_boundaries_only() {
         let dict = [word("Propforce", "prop force")];
-        assert_eq!(apply(&dict, &[], false, "Open Prop Force now, not prop forces.").text, "Open Propforce now, not prop forces.");
+        assert_eq!(
+            apply(&dict, &[], false, "Open Prop Force now, not prop forces.").text,
+            "Open Propforce now, not prop forces."
+        );
     }
 
     #[test]
@@ -561,7 +570,8 @@ mod tests {
 
     #[test]
     fn tidy_removes_fillers_and_repeats() {
-        let (text, removed) = tidy_up("Um, so I I think we need to, we need to ship the the fix. It works, uh, mostly.");
+        let (text, removed) =
+            tidy_up("Um, so I I think we need to, we need to ship the the fix. It works, uh, mostly.");
         assert_eq!(text, "So I think we need to ship the fix. It works, mostly.");
         assert_eq!(removed, 7);
     }
@@ -608,7 +618,8 @@ mod tests {
 
     #[test]
     fn a_faithful_rewrite_is_used_and_counted() {
-        let rewrite = "We should move the launch. The QA team still needs two days. I want the docs ready. Let's meet Wednesday.";
+        let rewrite =
+            "We should move the launch. The QA team still needs two days. I want the docs ready. Let's meet Wednesday.";
         let applied = apply_with(&[], &[], true, LONG, |_| Some(rewrite.to_owned()));
         assert_eq!(applied.text, rewrite);
         // Rules removed "we"; the rewrite dropped "So", "they", "need", "Tuesday", "no".

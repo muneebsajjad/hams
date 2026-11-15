@@ -126,10 +126,7 @@ fn build_tray(handle: &AppHandle, app: &Arc<App>) -> tauri::Result<()> {
     let paste = MenuItem::with_id(handle, "paste", "Paste last transcript", true, None::<&str>)?;
     let open = MenuItem::with_id(handle, "open", "Open hams", true, None::<&str>)?;
     let quit = MenuItem::with_id(handle, "quit", "Quit hams", true, Some("CmdOrCtrl+Q"))?;
-    let menu = Menu::with_items(
-        handle,
-        &[&toggle, &paste, &PredefinedMenuItem::separator(handle)?, &open, &quit],
-    )?;
+    let menu = Menu::with_items(handle, &[&toggle, &paste, &PredefinedMenuItem::separator(handle)?, &open, &quit])?;
     app.set_tray_toggle(toggle);
 
     let app = app.clone();
