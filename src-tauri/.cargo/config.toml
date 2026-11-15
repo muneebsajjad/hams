@@ -1,0 +1,5 @@
+# whisper.cpp is compiled from source by whisper-rs-sys, which forwards GGML_* variables
+# to CMake. Native CPU tuning is off so a built hams runs on machines other than the
+# one that built it (and Apple clang rejects -mcpu=native under the flags CMake passes).
+[env]
+GGML_NATIVE = "OFF"

@@ -1,0 +1,17 @@
+[package]
+name = "hams-platform"
+version = "0.1.0"
+edition = "2021"
+description = "OS glue for hams: push-to-talk key, typing into other apps, permissions."
+
+[target.'cfg(not(target_os = "linux"))'.dependencies]
+arboard = { version = "3", default-features = false }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+core-foundation = "0.10"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+arboard = { version = "3", default-features = false, features = ["wayland-data-control"] }
+evdev = "0.13"
+libc = "0.2"
