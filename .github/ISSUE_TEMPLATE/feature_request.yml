@@ -1,0 +1,19 @@
+name: Feature request
+description: Suggest an idea.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that hams makes hard today?
+    validations: { required: true }
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+  - type: markdown
+    attributes:
+      value: >
+        hams keeps everything on the user's machine. Ideas that need a cloud service or send
+        data anywhere are out of scope.

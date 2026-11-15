@@ -2,6 +2,8 @@
 name = "hams-platform"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/muneebsajjad/hams"
 description = "OS glue for hams: push-to-talk key, typing into other apps, permissions."
 
 [target.'cfg(not(target_os = "linux"))'.dependencies]

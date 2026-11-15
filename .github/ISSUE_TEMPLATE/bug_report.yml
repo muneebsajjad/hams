@@ -1,0 +1,39 @@
+name: Bug report
+description: Something does not work as described.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations: { required: true }
+  - type: dropdown
+    id: os
+    attributes:
+      label: System
+      options:
+        - macOS, Apple Silicon
+        - macOS, Intel
+        - Linux, X11
+        - Linux, Wayland
+    validations: { required: true }
+  - type: input
+    id: versions
+    attributes:
+      label: OS version and hams version
+      placeholder: macOS 26.1, hams 0.1.0
+    validations: { required: true }
+  - type: input
+    id: model
+    attributes:
+      label: Speech model (and cleanup model, if on)
+      placeholder: base.en
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: >
+        For wrong transcripts, the output of `hams --transcribe clip.wav --verbose`.
+        Do not attach recordings of private speech.
+      render: text
