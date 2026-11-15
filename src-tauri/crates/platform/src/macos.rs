@@ -33,7 +33,8 @@ const KEYS: [(i64, u64); 4] = [
 ];
 
 pub const INPUT_PERMISSION: &str = "Accessibility";
-pub const INPUT_HELP: &str = "Open System Settings → Privacy & Security → Accessibility, add hams and switch it on, then restart hams.";
+pub const INPUT_HELP: &str =
+    "Open System Settings → Privacy & Security → Accessibility, add hams and switch it on, then restart hams.";
 
 type CGEventRef = *mut c_void;
 type CFMachPortRef = *mut c_void;
@@ -172,7 +173,8 @@ pub fn open_input_settings() {
 
 pub fn mic_status() -> MicStatus {
     // AVAuthorizationStatus: 0 not determined, 1 restricted, 2 denied, 3 authorized.
-    let status: isize = unsafe { msg_send![class!(AVCaptureDevice), authorizationStatusForMediaType: AVMediaTypeAudio] };
+    let status: isize =
+        unsafe { msg_send![class!(AVCaptureDevice), authorizationStatusForMediaType: AVMediaTypeAudio] };
     match status {
         3 => MicStatus::Granted,
         0 => MicStatus::Undetermined,

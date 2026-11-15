@@ -11,7 +11,9 @@ use tauri::menu::MenuItem;
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, Wry};
 
 use crate::audio::{self, Recorder, SAMPLE_RATE};
-use crate::core::{self, disk, paths, text, DictWord, Entry, ModelInfo, PolishModel, Settings, Snippet, MODELS, POLISH_MODELS};
+use crate::core::{
+    self, disk, paths, text, DictWord, Entry, ModelInfo, PolishModel, Settings, Snippet, MODELS, POLISH_MODELS,
+};
 use crate::download;
 use crate::polish::Polisher;
 use crate::transcriber::Transcriber;
@@ -592,18 +594,15 @@ impl App {
 
         let app = self.clone();
         std::thread::spawn(move || {
-            let result = app
-                .transcriber
-                .transcribe(&samples, &language, &hint)
-                .map(|raw| {
-                    text::apply_with(&dictionary, &snippets, tidy, &raw, |tidied| {
-                        if !polish {
-                            return None;
-                        }
-                        let glossary: Vec<String> = dictionary.iter().map(|d| d.word.clone()).collect();
-                        app.polisher.polish(tidied, &glossary).ok()
-                    })
-                });
+            let result = app.transcriber.transcribe(&samples, &language, &hint).map(|raw| {
+                text::apply_with(&dictionary, &snippets, tidy, &raw, |tidied| {
+                    if !polish {
+                        return None;
+                    }
+                    let glossary: Vec<String> = dictionary.iter().map(|d| d.word.clone()).collect();
+                    app.polisher.polish(tidied, &glossary).ok()
+                })
+            });
             // A timeout stops the helper; bring it back for the next dictation.
             if polish && !app.polisher.is_loaded() {
                 app.load_polish();
