@@ -16,7 +16,7 @@ use tauri::image::Image;
 use tauri::ipc::Response;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
-use tauri::{AppHandle, Manager, RunEvent, State, WindowEvent};
+use tauri::{AppHandle, Manager, State, WindowEvent};
 
 use crate::app::{App, Snapshot};
 use crate::core::{DictWord, ModelInfo, PolishModel, Settings, Snippet, MODELS, POLISH_MODELS};
@@ -211,7 +211,7 @@ fn run_app() {
 
     built.run(|_handle, _event| {
         #[cfg(target_os = "macos")]
-        if let RunEvent::Reopen { .. } = _event {
+        if let tauri::RunEvent::Reopen { .. } = _event {
             show_main(_handle);
         }
     });
