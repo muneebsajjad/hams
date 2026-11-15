@@ -2,6 +2,8 @@
 name = "hams-polish"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/muneebsajjad/hams"
 description = "Helper process for hams: cleans up dictated text with a small local language model (llama.cpp)."
 
 [[bin]]

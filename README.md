@@ -111,11 +111,26 @@ said and whether its rewrite was kept.
 
 ```sh
 npm run sidecar                 # once: builds hams-polish, which the main build expects to exist
-cd src-tauri && cargo test
+cd src-tauri
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
 cargo check -p hams-platform --target x86_64-unknown-linux-gnu   # type-check the Linux code from a Mac
 ```
 
 ## Status
 
-Built and run on macOS (Apple Silicon). The Linux code is type-checked from macOS but has
-not yet been run on a Linux machine.
+Built and run on macOS, both Apple Silicon and Intel. Apple Silicon uses the GPU (Metal); Intel
+Macs run on the CPU, because Metal on their AMD/Intel GPUs gives wrong transcripts. CI builds and
+tests on Linux, but the Linux app has had very little real-world use, so reports are welcome.
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first, and report
+security problems as described in [SECURITY.md](SECURITY.md).
+
+## License
+
+[MIT](LICENSE). hams builds on [whisper.cpp](https://github.com/ggml-org/whisper.cpp),
+[llama.cpp](https://github.com/ggml-org/llama.cpp) and [Tauri](https://tauri.app), all
+MIT-licensed. Downloaded models have their own licenses.
