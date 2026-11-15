@@ -34,7 +34,9 @@ impl Transcriber {
         }
         *loaded = None; // free the previous model before loading the next
         let mut params = WhisperContextParameters::default();
-        params.use_gpu(true);
+        // Metal only on Apple Silicon: on Intel Macs with AMD/Intel GPUs whisper.cpp's Metal
+        // backend produces garbage transcripts (and the CPU is faster there anyway).
+        params.use_gpu(cfg!(all(target_os = "macos", target_arch = "aarch64")));
         let context = WhisperContext::new_with_params(path, params)
             .map_err(|e| format!("Could not load model at {path} ({e})"))?;
         let state = context.create_state().map_err(|e| format!("Could not load model at {path} ({e})"))?;
