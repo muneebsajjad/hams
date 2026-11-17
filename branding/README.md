@@ -13,3 +13,6 @@ Regenerate the PNGs (`logo.png` 1024x1024, `tray.png` 44x44) from the SVGs:
 python3 -m venv /tmp/hams-venv && /tmp/hams-venv/bin/pip install resvg-py pillow
 /tmp/hams-venv/bin/python render.py
 ```
+
+`social-preview.png` (1280x640) is the image GitHub shows when the repo link is shared. Upload it under
+the repo's Settings → General → Social preview.
