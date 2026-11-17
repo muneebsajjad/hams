@@ -1,14 +1,59 @@
-# hams
+<p align="center">
+  <img src="branding/logo.png" width="128" height="128" alt="hams logo">
+</p>
 
-Local voice dictation for macOS and Linux. Hold a key, speak, release — the text is typed
-into whatever app has focus. Speech recognition runs on this machine with
-[whisper.cpp](https://github.com/ggml-org/whisper.cpp); no audio or text is sent anywhere.
-The only network call the app ever makes is downloading a speech model when you ask for
-one in Settings.
+<h1 align="center">hams</h1>
+
+<p align="center">
+  <strong>Private, offline voice dictation for macOS and Linux.</strong><br>
+  Hold a key, speak, let go: the text is typed into whatever app has focus.
+</p>
+
+<p align="center">
+  <a href="https://github.com/muneebsajjad/hams/actions/workflows/ci.yml"><img src="https://github.com/muneebsajjad/hams/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-5E5CE0" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-5E5CE0" alt="macOS and Linux">
+  <img src="https://img.shields.io/badge/telemetry-none-2c9a52" alt="No telemetry">
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
+    <img src="docs/screenshots/home.png" width="860" alt="The hams window: today's dictations, words per minute and day streak">
+  </picture>
+</p>
+
+Speech recognition runs on this machine with [whisper.cpp](https://github.com/ggml-org/whisper.cpp),
+and an optional small language model ([llama.cpp](https://github.com/ggml-org/llama.cpp)) cleans up
+long dictations. No audio or text is sent anywhere. The only network call the app ever makes is
+downloading a model when you ask for one in Settings.
 
 "hams" (همس) is the Arabic and Urdu word for a whisper.
 
 It is a Tauri rewrite of the Swift app Murmur, so the same code runs on both systems.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/insights.png" alt="Insights: words per minute, fixes made, words by app and an activity map"></td>
+    <td width="50%"><img src="docs/screenshots/settings.png" alt="Settings: push-to-talk key, language and on-device models"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Insights, computed from the local history</sub></td>
+    <td align="center"><sub>Settings: everything runs on this computer</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/dictionary.png" alt="Dictionary of names and terms, in dark mode"></td>
+    <td width="50%" align="center"><img src="docs/screenshots/pill.png" width="260" alt="The floating recording indicator"><br><br><sub>The floating indicator while you speak</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Dictionary, in dark mode</sub></td>
+    <td></td>
+  </tr>
+</table>
+
+<sub>Screenshots use made-up sample data from the demo page (`demo/`); see [Updating the screenshots](#updating-the-screenshots).</sub>
 
 ## Build and run
 
@@ -105,6 +150,7 @@ said and whether its rewrite was kept.
 | `src-tauri/src/main.rs` | Commands, tray, windows, CLI |
 | `src-tauri/crates/platform/` | Everything OS-specific: global key, typing, permissions (`macos.rs`, `linux.rs`) |
 | `src/` | The window (React + TypeScript) and the floating pill |
+| `demo/` | The UI in a browser with sample data, for screenshots and UI work |
 | `branding/` | Logo sources; `src-tauri/icons/` is generated from them with `npm run tauri icon branding/logo.png` |
 
 ## Tests
@@ -116,6 +162,18 @@ cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 cargo check -p hams-platform --target x86_64-unknown-linux-gnu   # type-check the Linux code from a Mac
+```
+
+## Updating the screenshots
+
+`demo/` runs the real UI in a browser with made-up data and no Rust side, which is also handy
+for UI work. With `npm run dev` running, open <http://localhost:1420/demo/>
+(`?window=pill` shows the recording indicator). To regenerate `docs/screenshots/`:
+
+```sh
+npm run dev &
+npx -y -p playwright@1.56 playwright install chromium-headless-shell   # once
+npm i --no-save playwright-core@1.56 && node scripts/screenshots.mjs
 ```
 
 ## Status

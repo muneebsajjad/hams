@@ -72,6 +72,8 @@ export function Insights() {
       wpm: seconds > 1 ? Math.round(words / (seconds / 60)) : 0,
       change: monthChange(entries),
       apps,
+      // The "other apps" row can outweigh the top app, so bars scale to whichever is widest.
+      widest: Math.max(...apps.map(([, n]) => n)),
       appCount: byApp.size,
       streak: streakOf(entries),
       longest: longestStreak(entries),
@@ -158,7 +160,7 @@ export function Insights() {
                       {number.format(words)} words · {share}%
                     </span>
                     <div className="bar-track">
-                      <div className="bar-fill" style={{ width: `${(words / stats.apps[0][1]) * 100}%` }} />
+                      <div className="bar-fill" style={{ width: `${(words / stats.widest) * 100}%` }} />
                     </div>
                   </div>
                 );
