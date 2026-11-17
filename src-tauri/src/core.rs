@@ -655,7 +655,7 @@ mod tests {
     }
 
     #[test]
-    fn murmur_history_format_is_readable() {
+    fn history_format_is_readable() {
         let json = r#"[{"id":"A","date":"2026-11-12T17:08:00Z","text":"hi","duration":1.5,"words":1,"audioFile":"A.wav","app":"Slack"}]"#;
         let entries: Vec<Entry> = serde_json::from_str(json).unwrap();
         assert_eq!(entries[0].audio_file.as_deref(), Some("A.wav"));

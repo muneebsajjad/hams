@@ -30,8 +30,6 @@ downloading a model when you ask for one in Settings.
 
 "hams" (همس) is the Arabic and Urdu word for a whisper.
 
-It is a Tauri rewrite of the Swift app Murmur, so the same code runs on both systems.
-
 ## Screenshots
 
 <table>
@@ -55,7 +53,39 @@ It is a Tauri rewrite of the Swift app Murmur, so the same code runs on both sys
 
 <sub>Screenshots use made-up sample data from the demo page (`demo/`); see [Updating the screenshots](#updating-the-screenshots).</sub>
 
-## Build and run
+## Install
+
+Download the latest version from the **[Releases page](https://github.com/muneebsajjad/hams/releases/latest)**.
+
+| System | File |
+|---|---|
+| Mac with Apple Silicon (M1 and later) | `hams_<version>_aarch64.dmg` |
+| Mac with an Intel processor | `hams_<version>_x64.dmg` |
+| Ubuntu, Debian, Mint | `hams_<version>_amd64.deb` |
+| Fedora, openSUSE | `hams-<version>-1.x86_64.rpm` |
+| Any other Linux | `hams_<version>_amd64.AppImage` |
+
+Not sure which Mac you have? Apple menu → About This Mac: "Chip: Apple M…" means Apple
+Silicon, "Processor: Intel…" means Intel.
+
+**macOS:** open the `.dmg` and drag hams into Applications. hams is not yet signed with an
+Apple Developer ID, so the first time macOS says it "cannot be opened". Either go to System
+Settings → Privacy & Security and click **Open Anyway**, or run this once in Terminal:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/hams.app
+```
+
+**Linux:** `sudo apt install ./hams_*_amd64.deb`, `sudo dnf install ./hams-*.x86_64.rpm`, or
+make the AppImage executable (`chmod +x hams_*.AppImage`) and run it. Then do the one-time
+key and typing setup under [Permissions](#permissions).
+
+On first launch, allow the microphone and the typing permission (see [Permissions](#permissions)),
+then pick a speech model in Settings. It downloads once and runs offline from then on.
+
+## Build from source
+
+For development, or a system without a ready-made download.
 
 Needs Rust, Node 22+ (`.nvmrc`), CMake and a C/C++ compiler. whisper.cpp and llama.cpp
 are compiled from source on the first build, which takes several minutes.
@@ -122,8 +152,6 @@ the transcript is still on the clipboard.
 `~/Library/Application Support/hams/` on macOS, `~/.local/share/hams/` on Linux:
 `settings.json`, `history.json`, `dictionary.json`, `snippets.json`, `scratchpad.txt`,
 `audio/*.wav`, `models/*.bin` (speech), `models/*.gguf` (cleanup).
-
-The JSON files use the same format as Murmur's, so they can be copied across.
 
 ## Engine checks without the UI
 
