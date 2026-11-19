@@ -8,7 +8,7 @@ use std::time::Duration;
 use hams_platform::{self as platform, HotkeyEvent, MicStatus, Sound};
 use serde::Serialize;
 use tauri::menu::MenuItem;
-use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, Wry};
+use tauri::{AppHandle, Emitter, LogicalPosition, Manager, Wry};
 
 use crate::audio::{self, Recorder, SAMPLE_RATE};
 use crate::core::{
@@ -329,12 +329,14 @@ impl App {
             .and_then(|p| self.handle.monitor_from_point(p.x, p.y).ok().flatten())
             .or_else(|| pill.primary_monitor().ok().flatten());
         let Some(monitor) = monitor else { return };
+        // Work in that screen's points. A physical position would be read with the scale of the
+        // screen the pill is on now, so moving from a 1x monitor to a 2x one put it off-screen.
         let area = monitor.work_area();
         let scale = monitor.scale_factor();
-        let (width, height, margin) = (260.0 * scale, 48.0 * scale, 28.0 * scale);
-        let x = area.position.x as f64 + (area.size.width as f64 - width) / 2.0;
-        let y = area.position.y as f64 + area.size.height as f64 - height - margin;
-        let _ = pill.set_position(PhysicalPosition::new(x.round() as i32, y.round() as i32));
+        let (left, top) = (area.position.x as f64 / scale, area.position.y as f64 / scale);
+        let (w, h) = (area.size.width as f64 / scale, area.size.height as f64 / scale);
+        let (width, height, margin) = (260.0, 48.0, 28.0);
+        let _ = pill.set_position(LogicalPosition::new(left + (w - width) / 2.0, top + h - height - margin));
     }
 
     // MARK: Model
